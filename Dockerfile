@@ -7,7 +7,7 @@ COPY glide* ./
 RUN glide install
 COPY . ./
 RUN go test $(glide nv) && \
-    go build -buildmode=exe -a -o /bin/auth ./cmd/auth
+    go build -buildmode=exe -a -o /bin/auth ./cmd/server
 
 FROM alpine
 ENTRYPOINT ["/usr/bin/server"]
