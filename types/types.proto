@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+service AuthenticationService {
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateReply);
+}
+
+message AuthenticateRequest {
+    ProtocolContext protocol  = 1;
+    TransportContext transport  = 2;
+}
+message AuthenticateReply {
+    bool success = 1;
+    string tenant = 2;
+}
+
+message TransportContext {
+    bool encrypted = 1;
+    string remoteAddress = 2;
+    bytes x509Certificate = 3;
+}
+
+message ProtocolContext {
+    string username = 1;
+    string password = 2;
+}
