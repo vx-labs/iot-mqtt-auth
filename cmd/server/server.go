@@ -15,7 +15,7 @@ type Authenticator struct{
 
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
-	return &types.AuthenticateReply{Success: true}, nil
+	return &types.AuthenticateReply{Success: true, Tenant: "_default"}, nil
 }
 
 func main() {
