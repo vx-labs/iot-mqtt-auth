@@ -7,15 +7,22 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"golang.org/x/net/context"
+	"os"
 )
 
-type Authenticator struct{
+type Authenticator struct {
 	logger *logrus.Entry
 }
 
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
-	return &types.AuthenticateReply{Success: true, Tenant: "_default"}, nil
+	success := in.Transport.Ensure(
+		types.MustBeEncrypted(),
+	)
+	success = success && in.Protocol.Ensure(
+		types.MustUseStaticSharedKey(os.Getenv("PSK")),
+	)
+	return &types.AuthenticateReply{Success: false, Tenant: "_default"}, nil
 }
 
 func main() {
