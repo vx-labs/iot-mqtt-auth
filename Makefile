@@ -16,5 +16,6 @@ deploy:
         -e ENVIRONMENT_PUBLIC_NAME=mqtt.$$IOT_ENVIRONMENT_NAME \
         -e APPROLE_ID=$$IOT_MQTT_AUTH_APPROLE_ID \
         -e APPROLE_SECRET=$$IOT_MQTT_AUTH_APPROLE_SECRET \
+        -e PSK=$$IOT_MQTT_AUTH_PSK \
         -v $$(pwd)/kubernetes-spec.yml.template:/media/template:ro \
         ${DOCKER_REGISTRY}/vxlabs/k8s-deploy

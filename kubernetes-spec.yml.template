@@ -26,6 +26,8 @@ spec:
             value: "{{ APPROLE_ID }}"
           - name: "APPROLE_SECRET"
             value: "{{ APPROLE_SECRET }}"
+          - name: "PSK"
+            value: "{{ PSK }}"
         ports:
         - containerPort: 7994
       - env:
