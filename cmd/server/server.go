@@ -16,13 +16,14 @@ type Authenticator struct {
 
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
-	success := in.Transport.Ensure(
+	isTransportCompliant := in.Transport.Ensure(
 		types.MustBeEncrypted(),
 	)
-	success = success && in.Protocol.Ensure(
+	isProtocolCompliant := in.Protocol.Ensure(
 		types.MustUseStaticSharedKey(os.Getenv("PSK")),
 	)
-	return &types.AuthenticateReply{Success: false, Tenant: "_default"}, nil
+	success := isProtocolCompliant && isTransportCompliant
+	return &types.AuthenticateReply{Success: success, Tenant: "_default"}, nil
 }
 
 func main() {
