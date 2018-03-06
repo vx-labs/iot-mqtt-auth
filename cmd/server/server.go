@@ -21,7 +21,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 		types.MustBeEncrypted(),
 	)
 	isProtocolCompliant := in.Protocol.Ensure(
-		types.MustUseStaticSharedKey(os.Getenv("PSK")),
+		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseStaticSharedKey(os.Getenv("PSK2"))),
 	)
 	success := isProtocolCompliant && isTransportCompliant
 	if success {
