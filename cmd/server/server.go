@@ -15,21 +15,48 @@ type Authenticator struct {
 	logger *logrus.Entry
 }
 
+func electTenant(left, right string) string {
+	if left == "" {
+		left = "_default"
+	}
+	if right == "" {
+		right = "_default"
+	}
+	if left == right {
+		return left
+	}
+	if left == "_default" {
+		if right != "default" { return right}
+	}
+	if right == "_default" {
+		if left != "default" { return left}
+	}
+	if left != right {
+		return left
+	}
+	return "_default"
+}
+
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
-	isTransportCompliant := in.Transport.Ensure(
+	isTransportCompliant, transportTenant := in.Transport.Ensure(
 		types.MustBeEncrypted(),
 	)
-	isProtocolCompliant := in.Protocol.Ensure(
-		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseStaticSharedKey(os.Getenv("PSK2"))),
+	isProtocolCompliant, protocolTenant := in.Protocol.Ensure(
+		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseDemoCredentials()),
 	)
 	success := isProtocolCompliant && isTransportCompliant
+	if transportTenant != protocolTenant {
+		a.logger.Warn("transport tenant is different from protocol tenant: %s != %s", transportTenant, protocolTenant)
+		a.logger.Warn("using protocol tenant %s", protocolTenant)
+	}
+	tenant := electTenant(transportTenant, protocolTenant)
 	if success {
-		metrics.AccessGranted.WithLabelValues("psk", "_default").Inc()
+		metrics.AccessGranted.WithLabelValues("psk", tenant).Inc()
 	} else {
 		metrics.AccessDenied.Inc()
 	}
-	return &types.AuthenticateReply{Success: success, Tenant: "_default"}, nil
+	return &types.AuthenticateReply{Success: success, Tenant: tenant}, nil
 }
 
 func main() {
