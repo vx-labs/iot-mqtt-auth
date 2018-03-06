@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"golang.org/x/net/context"
 	"os"
+	"github.com/vx-labs/iot-mqtt-auth/metrics"
 )
 
 type Authenticator struct {
@@ -23,6 +24,11 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 		types.MustUseStaticSharedKey(os.Getenv("PSK")),
 	)
 	success := isProtocolCompliant && isTransportCompliant
+	if success {
+		metrics.AccessGranted.WithLabelValues("psk", "_default").Inc()
+	} else {
+		metrics.AccessDenied.Inc()
+	}
 	return &types.AuthenticateReply{Success: success, Tenant: "_default"}, nil
 }
 
@@ -32,6 +38,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to listen: %v", err)
 	}
+	m := metrics.NewMetricHandler()
 	s := grpc.NewServer()
 	store := &Authenticator{
 		logger: logrus.New().WithField("source", "service"),
@@ -42,4 +49,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("failed to serve: %v", err)
 	}
+	m.Close()
 }

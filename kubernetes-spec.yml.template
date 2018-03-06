@@ -90,11 +90,31 @@ kind: Service
 metadata:
   name: mqtt-auth
   namespace: {{ KUBE_NAMESPACE }}
+  labels:
+    app: mqtt-auth
 spec:
   ports:
   - name: mqtt
     targetPort: 7994
     port: 7994
+  - name: metrics
+    port: 8080
   selector:
     app: mqtt-auth
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mqtt-auth
+  labels:
+    service: auth
+    app: mqtt
+spec:
+  selector:
+    matchLabels:
+      app: mqtt-auth
+  endpoints:
+  - port: metrics
+    path: /metrics
+
 
