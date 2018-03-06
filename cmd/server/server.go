@@ -38,7 +38,7 @@ func main() {
 	}
 	types.RegisterAuthenticationServiceServer(s, store)
 	reflection.Register(s)
-	logrus.Infof("serving session store on %v", port)
+	logrus.Infof("serving authentication service on %v", port)
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("failed to serve: %v", err)
 	}
