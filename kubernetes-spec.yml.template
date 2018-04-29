@@ -11,8 +11,8 @@ spec:
   template:
     metadata:
       annotations:
-        conduit.io/created-by: conduit/cli v0.1.3
-        conduit.io/proxy-version: v0.1.3
+        conduit.io/created-by: conduit/cli v0.4.1
+        conduit.io/proxy-version: v0.4.1
       labels:
         app: mqtt-auth
         conduit.io/controller: conduit
@@ -55,7 +55,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONDUIT_PROXY_DESTINATIONS_AUTOCOMPLETE_FQDN
           value: Kubernetes
-        image: gcr.io/runconduit/proxy:v0.1.3
+        image: gcr.io/runconduit/proxy:v0.4.1
         imagePullPolicy: IfNotPresent
         name: conduit-proxy
         ports:
@@ -74,7 +74,7 @@ spec:
         - "2102"
         - --inbound-ports-to-ignore
         - "4190,8080"
-        image: gcr.io/runconduit/proxy-init:v0.1.3
+        image: gcr.io/runconduit/proxy-init:v0.4.1
         imagePullPolicy: IfNotPresent
         name: conduit-init
         resources: {}
