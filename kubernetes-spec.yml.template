@@ -15,8 +15,8 @@ spec:
         conduit.io/proxy-version: v0.4.1
       labels:
         app: mqtt-auth
-        conduit.io/controller: conduit
-        conduit.io/plane: data
+        conduit.io/control-plane-ns: conduit
+        conduit.io/proxy-deployment: mqtt-auth
     spec:
       containers:
       - name: "mqtt-auth"
@@ -37,30 +37,24 @@ spec:
           value: tcp://proxy-api.conduit.svc.{{ KUBE_DOMAIN }}:8086
         - name: CONDUIT_PROXY_CONTROL_LISTENER
           value: tcp://0.0.0.0:4190
+        - name: CONDUIT_PROXY_METRICS_LISTENER
+          value: tcp://0.0.0.0:4191
         - name: CONDUIT_PROXY_PRIVATE_LISTENER
           value: tcp://127.0.0.1:4140
         - name: CONDUIT_PROXY_PUBLIC_LISTENER
           value: tcp://0.0.0.0:4143
-        - name: CONDUIT_PROXY_NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        - name: CONDUIT_PROXY_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         - name: CONDUIT_PROXY_POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: CONDUIT_PROXY_DESTINATIONS_AUTOCOMPLETE_FQDN
-          value: Kubernetes
         image: gcr.io/runconduit/proxy:v0.4.1
         imagePullPolicy: IfNotPresent
         name: conduit-proxy
         ports:
         - containerPort: 4143
           name: conduit-proxy
+        - containerPort: 4191
+          name: conduit-metrics
         resources: {}
         securityContext:
           runAsUser: 2102
@@ -73,7 +67,7 @@ spec:
         - --proxy-uid
         - "2102"
         - --inbound-ports-to-ignore
-        - "4190,8080"
+        - 4190,4191
         image: gcr.io/runconduit/proxy-init:v0.4.1
         imagePullPolicy: IfNotPresent
         name: conduit-init
