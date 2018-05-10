@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/vx-labs/iot-mqtt-auth/types"
-	"google.golang.org/grpc/reflection"
 	"net"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-	"golang.org/x/net/context"
 	"os"
+
+	"github.com/sirupsen/logrus"
 	"github.com/vx-labs/iot-mqtt-auth/metrics"
+	"github.com/vx-labs/iot-mqtt-auth/types"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Authenticator struct {
@@ -26,10 +27,14 @@ func electTenant(left, right string) string {
 		return left
 	}
 	if left == "_default" {
-		if right != "default" { return right}
+		if right != "default" {
+			return right
+		}
 	}
 	if right == "_default" {
-		if left != "default" { return left}
+		if left != "default" {
+			return left
+		}
 	}
 	if left != right {
 		return left
@@ -40,7 +45,7 @@ func electTenant(left, right string) string {
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
 	isTransportCompliant, transportTenant := in.Transport.Ensure(
-		types.MustBeEncrypted(),
+		types.AlwaysAllowTransport(),
 	)
 	isProtocolCompliant, protocolTenant := in.Protocol.Ensure(
 		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseDemoCredentials()),

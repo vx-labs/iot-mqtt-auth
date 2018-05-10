@@ -10,7 +10,7 @@ func (p ProtocolAssertion) Or(assertion ProtocolAssertion) ProtocolAssertion {
 			return left, tenant
 		}
 		right, tenant := assertion(c)
-		if right{
+		if right {
 			return right, tenant
 		}
 		return false, ""
@@ -24,13 +24,18 @@ func (p TransportAssertion) Or(assertion TransportAssertion) TransportAssertion 
 			return left, tenant
 		}
 		right, tenant := assertion(c)
-		if right{
+		if right {
 			return right, tenant
 		}
 		return false, ""
 	}
 }
 
+func AlwaysAllowTransport() TransportAssertion {
+	return func(c *TransportContext) (bool, string) {
+		return true, ""
+	}
+}
 func MustBeEncrypted() TransportAssertion {
 	return func(c *TransportContext) (bool, string) {
 		return c.Encrypted, ""
