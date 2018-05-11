@@ -45,7 +45,7 @@ func MustBeEncrypted() TransportAssertion {
 func MustUseStaticSharedKey(key string) ProtocolAssertion {
 	return func(c *ProtocolContext) (bool, string) {
 		if c.Username == "vx:psk" || c.Username == "vx_psk" {
-			return key == c.Password, "_default"
+			return key != "" && key == c.Password, "_default"
 		}
 		return false, ""
 	}

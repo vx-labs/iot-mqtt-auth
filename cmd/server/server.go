@@ -48,7 +48,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 		types.AlwaysAllowTransport(),
 	)
 	isProtocolCompliant, protocolTenant := in.Protocol.Ensure(
-		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseDemoCredentials()),
+		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseStaticSharedKey(os.Getenv("PSK2"))).Or(types.MustUseDemoCredentials()),
 	)
 	success := isProtocolCompliant && isTransportCompliant
 	if transportTenant != protocolTenant {
