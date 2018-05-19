@@ -43,7 +43,6 @@ func electTenant(left, right string) string {
 }
 
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
-	a.logger.Infof("authentication request from %s", in.Transport.RemoteAddress)
 	isTransportCompliant, transportTenant := in.Transport.Ensure(
 		types.AlwaysAllowTransport(),
 	)
@@ -57,8 +56,10 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 	}
 	tenant := electTenant(transportTenant, protocolTenant)
 	if success {
+		a.logger.Infof("authentication successful from %s", in.Transport.RemoteAddress)
 		metrics.AccessGranted.WithLabelValues("psk", tenant).Inc()
 	} else {
+		a.logger.Infof("authentication denied from %s", in.Transport.RemoteAddress)
 		metrics.AccessDenied.Inc()
 	}
 	return &types.AuthenticateReply{Success: success, Tenant: tenant}, nil
