@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -9,7 +11,6 @@ import (
 	"github.com/vx-labs/iot-mqtt-auth/types"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 type Authenticator struct {
@@ -77,10 +78,17 @@ func main() {
 		logger: logrus.New().WithField("source", "service"),
 	}
 	types.RegisterAuthenticationServiceServer(s, store)
-	reflection.Register(s)
+	go serveHTTPHealth()
 	logrus.Infof("serving authentication service on %v", port)
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("failed to serve: %v", err)
 	}
 	m.Close()
+}
+func serveHTTPHealth() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	log.Println(http.ListenAndServe("[::]:9000", mux))
 }
