@@ -13,7 +13,8 @@ job "authentication" {
     count = 1
     vault {
       policies = ["nomad-authenticator"]
-      change_mode   = "noop"
+      change_mode   = "signal"
+      change_signal = "SIGUSR1"
       env = false
     }
     restart {
