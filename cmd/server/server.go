@@ -9,6 +9,7 @@ import (
 	"github.com/vx-labs/iot-mqtt-auth/identity"
 	"github.com/vx-labs/iot-mqtt-auth/metrics"
 	"github.com/vx-labs/iot-mqtt-auth/types"
+	"github.com/vx-labs/iot-mqtt-config"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -64,7 +65,7 @@ func serveHTTPHealth() {
 }
 
 func newAuthenticator() *Authenticator {
-	_, vaultAPI, err := defaultClients()
+	_, vaultAPI, err := config.DefaultClients()
 	if err != nil {
 		panic(err)
 	}
