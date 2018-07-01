@@ -1,30 +1,83 @@
-hash: 7cfc31c092f98d77e2c060588c3e24daddeb9ce028542e2d120a94c19be1bb4c
-updated: 2018-03-06T10:39:12.053732848+01:00
+hash: a4e06c1cf11fa586f8b5a85b0d4b81c7b6df2f25f012e8ff1e80b5b588e856ef
+updated: 2018-07-01T15:49:04.930383816+02:00
 imports:
+- name: github.com/armon/go-metrics
+  version: 58588f401c2cc130a7308a52ca3bc6c0a76db04b
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: 3a771d992973f24aa725d07868b467d1ddfceafb
   subpackages:
   - quantile
 - name: github.com/golang/protobuf
   version: 925541529c1fa6821df4e44ce2723319eb2be768
   subpackages:
   - proto
-  - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
+- name: github.com/golang/snappy
+  version: 2e65f85255dbc3072edf28d6b5b8efc472979f5a
+- name: github.com/hashicorp/consul
+  version: 5174058f0d2bda63fa5198ab96c33d9a909c58ed
+  subpackages:
+  - api
+- name: github.com/hashicorp/errwrap
+  version: 7554cd9344cec97297fa6649b055a8c98c2a1e55
+- name: github.com/hashicorp/go-cleanhttp
+  version: d5fe4b57a186c716b0e00b8c301cbd9b4182694d
+- name: github.com/hashicorp/go-immutable-radix
+  version: 7f3cd4390caab3250a57f30efdb2a65dd7649ecf
+- name: github.com/hashicorp/go-multierror
+  version: b7773ae218740a7be65057fc60b366a49b538a44
+- name: github.com/hashicorp/go-retryablehttp
+  version: 3b087ef2d313afe6c55b2f511d20db04ca767075
+- name: github.com/hashicorp/go-rootcerts
+  version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
+- name: github.com/hashicorp/go-sockaddr
+  version: 6d291a969b86c4b633730bfc6b8b9d64c3aafed9
+- name: github.com/hashicorp/golang-lru
+  version: 0fb14efe8c47ae851c0034ed7a448854d3d34cf3
+  subpackages:
+  - simplelru
+- name: github.com/hashicorp/hcl
+  version: ef8a98b0bbce4a65b5aa4c368430a80ddc533168
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/scanner
+  - hcl/strconv
+  - hcl/token
+  - json/parser
+  - json/scanner
+  - json/token
+- name: github.com/hashicorp/serf
+  version: 984a73625de3138f44deb38d00878fab39eb6447
+  subpackages:
+  - coordinate
+- name: github.com/hashicorp/vault
+  version: 5ddb2c3cb4608e7dd952a995d035703c50986944
+  subpackages:
+  - api
+  - helper/compressutil
+  - helper/hclutil
+  - helper/jsonutil
+  - helper/parseutil
+  - helper/strutil
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/mitchellh/go-homedir
+  version: 3864e76763d94a6df2f9960b16a20a33da9f9a66
+- name: github.com/mitchellh/mapstructure
+  version: bb74f1db0675b241733089d5a1faa5dd8b0ef57b
 - name: github.com/prometheus/client_golang
   version: 967789050ba94deca04a5e84cce8ad472ce313c1
   subpackages:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -37,8 +90,12 @@ imports:
   version: a6e9df898b1336106c743392c48ee0b71f5c4efa
   subpackages:
   - xfs
+- name: github.com/ryanuber/go-glob
+  version: 256dc444b735e061061cf46c809487313d5b0065
 - name: github.com/sirupsen/logrus
-  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
+  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+- name: github.com/vx-labs/iot-mqtt-config
+  version: f2eb8c6af8f7f72750a1def6e150d0792e784218
 - name: golang.org/x/crypto
   version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
   subpackages:
@@ -65,6 +122,10 @@ imports:
   - transform
   - unicode/bidi
   - unicode/norm
+- name: golang.org/x/time
+  version: fbb02b2291d28baffd63558aa44b4b56f178d650
+  subpackages:
+  - rate
 - name: google.golang.org/genproto
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
@@ -87,7 +148,6 @@ imports:
   - naming
   - peer
   - reflection
-  - reflection/grpc_reflection_v1alpha
   - resolver
   - resolver/dns
   - resolver/passthrough

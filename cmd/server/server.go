@@ -4,9 +4,9 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 
 	"github.com/sirupsen/logrus"
+	"github.com/vx-labs/iot-mqtt-auth/identity"
 	"github.com/vx-labs/iot-mqtt-auth/metrics"
 	"github.com/vx-labs/iot-mqtt-auth/types"
 	"golang.org/x/net/context"
@@ -14,56 +14,28 @@ import (
 )
 
 type Authenticator struct {
-	logger *logrus.Entry
-}
-
-func electTenant(left, right string) string {
-	if left == "" {
-		left = "_default"
-	}
-	if right == "" {
-		right = "_default"
-	}
-	if left == right {
-		return left
-	}
-	if left == "_default" {
-		if right != "default" {
-			return right
-		}
-	}
-	if right == "_default" {
-		if left != "default" {
-			return left
-		}
-	}
-	if left != right {
-		return left
-	}
-	return "_default"
+	providers []identity.Provider
 }
 
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
-	isTransportCompliant, transportTenant := in.Transport.Ensure(
-		types.AlwaysAllowTransport(),
-	)
-	isProtocolCompliant, protocolTenant := in.Protocol.Ensure(
-		types.MustUseStaticSharedKey(os.Getenv("PSK")).Or(types.MustUseStaticSharedKey(os.Getenv("PSK2"))).Or(types.MustUseDemoCredentials()),
-	)
-	success := isProtocolCompliant && isTransportCompliant
-	if transportTenant != protocolTenant {
-		a.logger.Warn("transport tenant is different from protocol tenant: %s != %s", transportTenant, protocolTenant)
-		a.logger.Warn("using protocol tenant %s", protocolTenant)
+	for _, p := range a.providers {
+		if p.CanHandle(in.Protocol, in.Transport) {
+			identity, err := p.Authenticate(in.Protocol, in.Transport)
+			if err == nil {
+				logrus.Infof("identity validated by %s from %s: user is %s, scoped to tenant %s", identity.Provider, in.Transport.RemoteAddress, identity.ID, identity.Tenant)
+				return &types.AuthenticateReply{
+					Success: true,
+					Tenant:  identity.Tenant,
+				}, nil
+			}
+			logrus.Infof("authentication failed from %s (provider %s)", in.Transport.RemoteAddress, identity.Provider)
+
+		}
 	}
-	tenant := electTenant(transportTenant, protocolTenant)
-	if success {
-		a.logger.Infof("authentication successful from %s", in.Transport.RemoteAddress)
-		metrics.AccessGranted.WithLabelValues("psk", tenant).Inc()
-	} else {
-		a.logger.Infof("authentication denied from %s", in.Transport.RemoteAddress)
-		metrics.AccessDenied.Inc()
-	}
-	return &types.AuthenticateReply{Success: success, Tenant: tenant}, nil
+	logrus.Infof("refused authentication from %s: no provider were able to confirm remote identity", in.Transport.RemoteAddress)
+	return &types.AuthenticateReply{
+		Success: false,
+	}, nil
 }
 
 func main() {
@@ -74,9 +46,7 @@ func main() {
 	}
 	m := metrics.NewMetricHandler()
 	s := grpc.NewServer()
-	store := &Authenticator{
-		logger: logrus.New().WithField("source", "service"),
-	}
+	store := newAuthenticator()
 	types.RegisterAuthenticationServiceServer(s, store)
 	go serveHTTPHealth()
 	logrus.Infof("serving authentication service on %v", port)
@@ -91,4 +61,18 @@ func serveHTTPHealth() {
 		w.WriteHeader(http.StatusOK)
 	})
 	log.Println(http.ListenAndServe("[::]:9000", mux))
+}
+
+func newAuthenticator() *Authenticator {
+	_, vaultAPI, err := defaultClients()
+	if err != nil {
+		panic(err)
+	}
+	a := &Authenticator{
+		providers: []identity.Provider{
+			identity.NewStaticVaultProvider(vaultAPI, "vx-psk"),
+			identity.NewStaticVaultProvider(vaultAPI, "vx:psk"),
+		},
+	}
+	return a
 }

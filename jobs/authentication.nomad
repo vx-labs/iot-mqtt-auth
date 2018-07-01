@@ -11,14 +11,15 @@ job "authentication" {
   }
   group "app" {
     count = 1
+    vault {
+      policies = ["nomad-authenticator"]
+      change_mode   = "noop"
+    }
     restart {
       attempts = 10
       interval = "5m"
       delay = "15s"
       mode = "delay"
-    }
-    ephemeral_disk {
-      size = 300
     }
     task "store" {
       driver = "docker"
@@ -26,14 +27,15 @@ job "authentication" {
         CONSUL_HTTP_ADDR="172.17.0.1:8500"
       }
       config {
-        image = "jbonachera/authentication:local"
+        force_pull = true
+        image = "quay.io/vxlabs/iot-mqtt-auth:v1.0.1"
         port_map {
           AuthenticationService = 7994
           health = 9000
         }
       }
       resources {
-        cpu    = 500
+        cpu    = 20
         memory = 128
         network {
           mbits = 10
