@@ -14,6 +14,7 @@ job "authentication" {
     vault {
       policies = ["nomad-authenticator"]
       change_mode   = "noop"
+      env = false
     }
     restart {
       attempts = 10
