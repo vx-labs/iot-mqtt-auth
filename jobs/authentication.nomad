@@ -28,7 +28,7 @@ job "authentication" {
       }
       config {
         force_pull = true
-        image = "quay.io/vxlabs/iot-mqtt-auth:v1.0.1"
+        image = "quay.io/vxlabs/iot-mqtt-auth:v1.0.2"
         port_map {
           AuthenticationService = 7994
           health = 9000
