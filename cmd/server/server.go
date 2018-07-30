@@ -5,9 +5,10 @@ import (
 	"net"
 	"net/http"
 
+	grpctrace "github.com/DataDog/dd-trace-go/contrib/google.golang.org/grpc"
 	"github.com/sirupsen/logrus"
 	"github.com/vx-labs/iot-mqtt-auth/identity"
-	"github.com/vx-labs/iot-mqtt-auth/metrics"
+	"github.com/vx-labs/iot-mqtt-auth/tracing"
 	"github.com/vx-labs/iot-mqtt-auth/types"
 	"github.com/vx-labs/iot-mqtt-config"
 	"golang.org/x/net/context"
@@ -45,8 +46,10 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to listen: %v", err)
 	}
-	m := metrics.NewMetricHandler()
-	s := grpc.NewServer()
+	tracerInstance := tracing.Instance()
+	s := grpc.NewServer(grpc.UnaryInterceptor(
+		grpctrace.UnaryServerInterceptor("mqtt-authentication", tracerInstance),
+	))
 	store := newAuthenticator()
 	types.RegisterAuthenticationServiceServer(s, store)
 	go serveHTTPHealth()
@@ -54,7 +57,6 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("failed to serve: %v", err)
 	}
-	m.Close()
 }
 func serveHTTPHealth() {
 	mux := http.NewServeMux()

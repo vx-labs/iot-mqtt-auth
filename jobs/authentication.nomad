@@ -10,7 +10,7 @@ job "authentication" {
     canary = 0
   }
   group "app" {
-    count = 1
+    count = 3
     vault {
       policies = ["nomad-authenticator"]
       change_mode   = "signal"
@@ -30,7 +30,7 @@ job "authentication" {
       }
       config {
         force_pull = true
-        image = "quay.io/vxlabs/iot-mqtt-auth:v1.0.2"
+        image = "quay.io/vxlabs/iot-mqtt-auth:v1.0.3"
         port_map {
           AuthenticationService = 7994
           health = 9000
