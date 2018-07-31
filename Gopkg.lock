@@ -135,8 +135,8 @@
 [[projects]]
   name = "github.com/vx-labs/iot-mqtt-config"
   packages = ["."]
-  revision = "fc984d23196cd0565dc2000af46d5d0528d96977"
-  version = "v0.0.6"
+  revision = "5b9382c400ca8089b4bb85be03da0c01ac05a07e"
+  version = "v0.0.8"
 
 [[projects]]
   name = "golang.org/x/crypto"
