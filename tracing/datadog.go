@@ -1,18 +1,33 @@
 package tracing
 
 import (
+	"io"
+	"log"
 	"os"
 
-	"github.com/DataDog/dd-trace-go/tracer"
+	"github.com/opentracing/opentracing-go"
+
+	datadog "github.com/DataDog/dd-trace-go/opentracing"
 )
 
-var tracerInstance *tracer.Tracer
+var tracerInstance opentracing.Tracer
+var closer io.Closer
 
 func init() {
-	transport := tracer.NewTransport(os.Getenv("NOMAD_IP_health"), "8126")
-	tracerInstance = tracer.NewTracerTransport(transport)
+	var err error
+	config := datadog.NewConfiguration()
+	config.AgentHostname = os.Getenv("NOMAD_IP_health")
+	config.ServiceName = "mqtt-authentication"
+	tracerInstance, closer, err = datadog.NewTracer(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-func Instance() *tracer.Tracer {
+func Instance() opentracing.Tracer {
 	return tracerInstance
+}
+
+func Close() error {
+	return closer.Close()
 }

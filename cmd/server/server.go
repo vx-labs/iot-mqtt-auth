@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/http"
 
-	grpctrace "github.com/DataDog/dd-trace-go/contrib/google.golang.org/grpc"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/sirupsen/logrus"
 	"github.com/vx-labs/iot-mqtt-auth/identity"
 	"github.com/vx-labs/iot-mqtt-auth/tracing"
@@ -46,10 +46,15 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to listen: %v", err)
 	}
-	tracerInstance := tracing.Instance()
-	s := grpc.NewServer(grpc.UnaryInterceptor(
-		grpctrace.UnaryServerInterceptor("mqtt-authentication", tracerInstance),
-	))
+	tracer := tracing.Instance()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			otgrpc.OpenTracingServerInterceptor(tracer),
+		),
+		grpc.StreamInterceptor(
+			otgrpc.OpenTracingStreamServerInterceptor(tracer),
+		),
+	)
 	store := newAuthenticator()
 	types.RegisterAuthenticationServiceServer(s, store)
 	go serveHTTPHealth()

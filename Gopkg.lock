@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "github.com/DataDog/dd-trace-go"
-  packages = ["tracer","tracer/ext"]
+  packages = ["opentracing","tracer","tracer/ext"]
   revision = "27617015d45e6cd550b9a7ac7715c37cc2f7d020"
   version = "v0.6.1"
 
@@ -23,6 +23,12 @@
   name = "github.com/golang/snappy"
   packages = ["."]
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/grpc-ecosystem/grpc-opentracing"
+  packages = ["go/otgrpc"]
+  revision = "8e809c8a86450a29b90dcc9efbf062d0fe6d9746"
 
 [[projects]]
   name = "github.com/hashicorp/consul"
@@ -104,6 +110,12 @@
   revision = "bb74f1db0675b241733089d5a1faa5dd8b0ef57b"
 
 [[projects]]
+  name = "github.com/opentracing/opentracing-go"
+  packages = [".","ext","log"]
+  revision = "1949ddbfd147afd4d964a9f00b24eb291e0e7c38"
+  version = "v1.0.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/ryanuber/go-glob"
   packages = ["."]
@@ -166,6 +178,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8462181e6a67193251265371738c1d3f971437caf65c20d37d2512b8a5e983ef"
+  inputs-digest = "61f38cf2426cece896b8e27d338f32469ddb0f88c2e07beac7f04836cbf3aff2"
   solver-name = "gps-cdcl"
   solver-version = 1
