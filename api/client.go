@@ -1,16 +1,23 @@
 package api
 
 import (
-	"github.com/vx-labs/iot-mqtt-auth/types"
-	"google.golang.org/grpc"
-	"io"
 	"context"
 	"fmt"
+	"io"
+
+	"github.com/vx-labs/iot-mqtt-auth/types"
+	"google.golang.org/grpc"
 )
 
 type Client struct {
 	conn io.Closer
 	api  types.AuthenticationServiceClient
+}
+
+type AuthResponse struct {
+	ID     string
+	Tenant string
+	Token  string
 }
 
 func New(addr string) (*Client, error) {
@@ -29,14 +36,18 @@ func (c *Client) Close() error {
 	return c.conn.Close()
 }
 
-func (c *Client) Authenticate(ctx context.Context, a ...AuthOpt) (bool, string, error) {
+func (c *Client) Authenticate(ctx context.Context, a ...AuthOpt) (AuthResponse, error) {
 	opts := getOpts(a)
 	response, err := c.api.Authenticate(ctx, &types.AuthenticateRequest{
 		Transport: opts.TransportContext,
-		Protocol: opts.ProtocolContext,
+		Protocol:  opts.ProtocolContext,
 	})
 	if err != nil {
-		return false, "", fmt.Errorf("error ocurred when talking to authentication service: %v", err)
+		return AuthResponse{}, fmt.Errorf("error ocurred when talking to authentication service: %v", err)
 	}
-	return response.Success, response.Tenant, nil
+	return AuthResponse{
+		ID:     response.Id,
+		Tenant: response.Tenant,
+		Token:  response.Token,
+	}, nil
 }

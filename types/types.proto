@@ -9,8 +9,9 @@ message AuthenticateRequest {
     TransportContext transport  = 2;
 }
 message AuthenticateReply {
-    bool success = 1;
+    string id = 1;
     string tenant = 2;
+    string token = 3;
 }
 
 message TransportContext {

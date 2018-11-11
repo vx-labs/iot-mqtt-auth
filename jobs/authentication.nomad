@@ -12,7 +12,7 @@ job "authentication" {
   }
 
   group "app" {
-    count = 3
+    count = 2
 
     vault {
       policies      = ["nomad-authenticator"]
@@ -33,7 +33,7 @@ job "authentication" {
 
       env {
         CONSUL_HTTP_ADDR = "172.17.0.1:8500"
-        VAULT_ADDR       = "172.17.0.1:8200"
+        VAULT_ADDR       = "http://172.17.0.1:8200"
       }
 
       config {
@@ -48,7 +48,7 @@ job "authentication" {
 
       resources {
         cpu    = 20
-        memory = 128
+        memory = 32
 
         network {
           mbits = 10
