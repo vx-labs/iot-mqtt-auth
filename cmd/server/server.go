@@ -8,12 +8,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/sirupsen/logrus"
 	"github.com/vx-labs/iot-mqtt-auth/identity"
-	"github.com/vx-labs/iot-mqtt-auth/tracing"
 	"github.com/vx-labs/iot-mqtt-auth/types"
-	"github.com/vx-labs/iot-mqtt-config"
+	config "github.com/vx-labs/iot-mqtt-config"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -50,15 +48,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to listen: %v", err)
 	}
-	tracer := tracing.Instance()
-	s := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			otgrpc.OpenTracingServerInterceptor(tracer),
-		),
-		grpc.StreamInterceptor(
-			otgrpc.OpenTracingStreamServerInterceptor(tracer),
-		),
-	)
+	s := grpc.NewServer()
 	store := newAuthenticator()
 	types.RegisterAuthenticationServiceServer(s, store)
 	go serveHTTPHealth()
