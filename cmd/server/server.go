@@ -5,9 +5,6 @@ import (
 	"net"
 	"net/http"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/sirupsen/logrus"
 	"github.com/vx-labs/iot-mqtt-auth/identity"
 	"github.com/vx-labs/iot-mqtt-auth/types"
@@ -20,8 +17,6 @@ type Authenticator struct {
 	providers []identity.Provider
 }
 
-var ErrInvalidCredentials error = status.Error(codes.PermissionDenied, "invalid credentials")
-
 func (a *Authenticator) Authenticate(ctx context.Context, in *types.AuthenticateRequest) (*types.AuthenticateReply, error) {
 	for _, p := range a.providers {
 		if p.CanHandle(in.Protocol, in.Transport) {
@@ -29,9 +24,8 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 			if err == nil {
 				logrus.Infof("identity validated by %s from %s: user is %s, scoped to tenant %s", identity.Provider, in.Transport.RemoteAddress, identity.ID, identity.Tenant)
 				return &types.AuthenticateReply{
-					Id:     identity.ID,
-					Tenant: identity.Tenant,
-					Token:  "",
+					Success: true,
+					Tenant:  identity.Tenant,
 				}, nil
 			}
 			logrus.Infof("authentication failed from %s (provider %s)", in.Transport.RemoteAddress, identity.Provider)
@@ -39,7 +33,9 @@ func (a *Authenticator) Authenticate(ctx context.Context, in *types.Authenticate
 		}
 	}
 	logrus.Infof("refused authentication from %s: no provider were able to confirm remote identity", in.Transport.RemoteAddress)
-	return nil, ErrInvalidCredentials
+	return &types.AuthenticateReply{
+		Success: false,
+	}, nil
 }
 
 func main() {
